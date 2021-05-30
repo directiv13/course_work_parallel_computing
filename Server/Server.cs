@@ -12,16 +12,16 @@ namespace Server
 {
     class Server
     {
-        private readonly int port = 8005;
-        private readonly Socket appSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        private readonly IPEndPoint ipEndPoint;
+        private readonly int _port = 8005;
+        private readonly Socket _appSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private readonly IPEndPoint _ipEndPoint;
 
-        private readonly Dictionary<string, HashSet<string>> index;
+        private readonly Dictionary<string, HashSet<string>> _index;
         public Server()
         {
-            ipEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), port);
+            _ipEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), _port);
             string jsonString = File.ReadAllText("InvertedIndex.json");
-            index = JsonSerializer.Deserialize<Dictionary<string, HashSet<string>>>(jsonString);
+            _index = JsonSerializer.Deserialize<Dictionary<string, HashSet<string>>>(jsonString);
         }
         /// <summary>
         /// Запуск
@@ -30,11 +30,11 @@ namespace Server
         {
             try
             {
-                appSocket.Bind(ipEndPoint);
-                appSocket.Listen(10);
+                _appSocket.Bind(_ipEndPoint);
+                _appSocket.Listen(10);
                 while (true)
                 {
-                    Socket handler = appSocket.Accept();
+                    Socket handler = _appSocket.Accept();
 
                     var th = new Thread(Process);
                     th.Start(handler);
@@ -69,10 +69,10 @@ namespace Server
         {
             searchRequest = searchRequest.Replace("<EOF>", "");
             string[] termins = searchRequest.ToLower().Split(' ');
-            HashSet<string> searchResult = index[termins[0]];
+            HashSet<string> searchResult = _index[termins[0]];
 
             for (int i = 1; i < termins.Length; i++)
-                searchResult.IntersectWith(index[termins[i]]);
+                searchResult.IntersectWith(_index[termins[i]]);
 
             return searchResult;
         }
