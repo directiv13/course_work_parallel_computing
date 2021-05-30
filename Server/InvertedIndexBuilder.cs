@@ -10,7 +10,8 @@ namespace Server
 {
     class InvertedIndexBuilder
     {
-        SortedDictionary<string, HashSet<string>> InvertedIndex { get; set; }
+        private object _locker = new object();
+        private SortedDictionary<string, HashSet<string>> InvertedIndex { get; set; }
         public int StartFileIndex { get; set; }
         public int EndFileIndex { get; set; }
 
@@ -72,9 +73,38 @@ namespace Server
             }
             Task.Run(() => WriteToJson("InvertedIndex"));
         }
+        /// <summary>
+        /// Метод для обробки документів у окремому потоці
+        /// </summary>
+        /// <param name="obj">Параметри методу</param>
         private void IndexBuildParallel(object obj)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Index. Thread {0} started.", Thread.CurrentThread.ManagedThreadId);
+            int[] parameters = (int[])obj;
+            int startFileIndex = parameters[0];
+            int endFileIndex = parameters[1];
+
+            string[] fileNames = Directory.GetFiles(@"datasets\acllmdb\test\neg").Where(x => int.Parse(Path.GetFileName(x).Split('_')[0]) >= startFileIndex && int.Parse(Path.GetFileName(x).Split('_')[0]) <= endFileIndex).ToArray();
+
+            foreach (string fileName in fileNames)
+            {
+                List<string> content = ReadFile(fileName).ToList();
+                foreach (var token in content)
+                {
+                    lock (_locker)
+                    {
+                        if (!InvertedIndex.ContainsKey(token))
+                        {
+                            InvertedIndex.Add(token, new HashSet<string> { Path.GetFileName(fileName) });
+                        }
+                        else
+                        {
+                            InvertedIndex[token].Add(Path.GetFileName(fileName));
+                        }
+                    }
+                }
+            }
+            Console.WriteLine("Index. Thread {0} ended.", Thread.CurrentThread.ManagedThreadId);
         }
         private IEnumerable<string> ReadFile(string fileName)
         {
