@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -106,9 +107,23 @@ namespace Server
             }
             Console.WriteLine("Index. Thread {0} ended.", Thread.CurrentThread.ManagedThreadId);
         }
+        /// <summary>
+        /// Зчитування файлу
+        /// </summary>
+        /// <param name="fileName">Назва файлу</param>
+        /// <returns>Колекція лексем</returns>
         private IEnumerable<string> ReadFile(string fileName)
         {
-            throw new NotImplementedException();
+            string pattern = @"\W*";
+            Regex regex = new Regex(pattern);
+            List<string> result = File.ReadAllText(fileName).ToLower().Split(' ').ToList();
+
+            for (int i = 0; i < result.Count(); i++)
+            {
+                result[i] = regex.Replace(result[i], "");
+            }
+            result.RemoveAll(x => x == "");
+            return result;
         }
         private async void WriteToJson(string fileName)
         {
