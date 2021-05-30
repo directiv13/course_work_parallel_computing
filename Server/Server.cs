@@ -76,9 +76,26 @@ namespace Server
 
             return searchResult;
         }
+        /// <summary>
+        /// Отримуємо запит (повідомлення) від користувача
+        /// </summary>
+        /// <param name="handler">Сокет, що обслуговує даного користувача</param>
+        /// <returns>Запит, отриманий від користувача</returns>
         private string ReceiveRequest(Socket handler)
         {
-            throw new NotImplementedException();
+            string request = "";
+            byte[] dataBuffer = new byte[1024];
+
+            while (true)
+            {
+                int bytesRec = handler.Receive(dataBuffer);
+                request += Encoding.ASCII.GetString(dataBuffer, 0, bytesRec);
+                if (request.IndexOf("<EOF>") > -1)
+                {
+                    break;
+                }
+            }
+            return request;
         }
         private void SendResult(Socket handler, string data)
         {
