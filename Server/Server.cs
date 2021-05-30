@@ -16,18 +16,19 @@ namespace Server
         private readonly Socket _appSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private readonly IPEndPoint _ipEndPoint;
 
-        private readonly Dictionary<string, HashSet<string>> _index;
+        private Dictionary<string, HashSet<string>> _index;
         public Server()
         {
             _ipEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), _port);
-            string jsonString = File.ReadAllText("InvertedIndex.json");
-            _index = JsonSerializer.Deserialize<Dictionary<string, HashSet<string>>>(jsonString);
+            
         }
         /// <summary>
         /// Запуск
         /// </summary>
         public void Run()
         {
+            string jsonString = File.ReadAllText("InvertedIndex.json");
+            _index = JsonSerializer.Deserialize<Dictionary<string, HashSet<string>>>(jsonString);
             try
             {
                 _appSocket.Bind(_ipEndPoint);

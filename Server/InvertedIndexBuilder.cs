@@ -38,11 +38,11 @@ namespace Server
                 {
                     if (!InvertedIndex.ContainsKey(token))
                     {
-                        InvertedIndex.Add(token, new HashSet<string> { Path.GetFileName(fileName) });
+                        InvertedIndex.Add(token, new HashSet<string> { directory + @"\" + Path.GetFileName(fileName) });
                     }
                     else
                     {
-                        InvertedIndex[token].Add(Path.GetFileName(fileName));
+                        InvertedIndex[token].Add(directory + @"\" + Path.GetFileName(fileName));
                     }
 
                 }
@@ -90,7 +90,7 @@ namespace Server
             int endFileIndex = parameters.EndFileIndex;
             string directory = parameters.Directory;
 
-            string[] fileNames = Directory.GetFiles(@"datasets\acllmdb\test\neg").Where(x => int.Parse(Path.GetFileName(x).Split('_')[0]) >= startFileIndex && int.Parse(Path.GetFileName(x).Split('_')[0]) <= endFileIndex).ToArray();
+            string[] fileNames = Directory.GetFiles(directory).Where(x => int.Parse(Path.GetFileName(x).Split('_')[0]) >= startFileIndex && int.Parse(Path.GetFileName(x).Split('_')[0]) <= endFileIndex).ToArray();
 
             foreach (string fileName in fileNames)
             {
@@ -101,11 +101,11 @@ namespace Server
                     {
                         if (!InvertedIndex.ContainsKey(token))
                         {
-                            InvertedIndex.Add(token, new HashSet<string> { Path.GetFileName(fileName) });
+                            InvertedIndex.Add(token, new HashSet<string> { directory + @"\" + Path.GetFileName(fileName) });
                         }
                         else
                         {
-                            InvertedIndex[token].Add(Path.GetFileName(fileName));
+                            InvertedIndex[token].Add(directory + @"\" + Path.GetFileName(fileName));
                         }
                     }
                 }
@@ -137,7 +137,11 @@ namespace Server
         public void WriteToJson(string fileName)
         {
             string jsonString = JsonSerializer.Serialize<SortedDictionary<string, HashSet<string>>>(InvertedIndex);
-            File.WriteAllTextAsync(fileName + ".json", jsonString);
+            FileStream file = File.Create(fileName + ".json");
+
+            var writer = new StreamWriter(file);
+            writer.WriteLine(jsonString);
+            writer.Close();
         }
     }
 }
