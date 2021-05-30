@@ -5,6 +5,7 @@ using System.Net;
 using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Server
 {
@@ -26,7 +27,22 @@ namespace Server
         /// </summary>
         public void Run()
         {
-            throw new NotImplementedException();
+            try
+            {
+                appSocket.Bind(ipEndPoint);
+                appSocket.Listen(10);
+                while (true)
+                {
+                    Socket handler = appSocket.Accept();
+
+                    var th = new Thread(Process);
+                    th.Start(handler);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
         private void Process(object obj)
         {
