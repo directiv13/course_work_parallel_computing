@@ -27,7 +27,7 @@ namespace Server
         /// <summary>
         /// Метод для послідовнох побудови індексу
         /// </summary>
-        public void Build()
+        public void Build(string directory)
         {
             string[] fileNames = Directory.GetFiles(@"datasets\acllmdb\test\neg").Where(x => int.Parse(Path.GetFileName(x).Split('_')[0]) >= StartFileIndex && int.Parse(Path.GetFileName(x).Split('_')[0]) <= EndFileIndex).ToArray();
 
@@ -47,7 +47,6 @@ namespace Server
 
                 }
             }
-            WriteToJson("InvertedIndex");
         }
         /// <summary>
         /// Метод для паралельної побудови індексу
@@ -73,7 +72,6 @@ namespace Server
             {
                 threads[i].Join();
             }
-            Task.Run(() => WriteToJson("InvertedIndex"));
         }
         /// <summary>
         /// Метод для обробки документів у окремому потоці
@@ -130,10 +128,10 @@ namespace Server
         /// Запис у файл з розширенням .json
         /// </summary>
         /// <param name="fileName">Назва файлу</param>
-        private async void WriteToJson(string fileName)
+        public void WriteToJson(string fileName)
         {
             string jsonString = JsonSerializer.Serialize<SortedDictionary<string, HashSet<string>>>(InvertedIndex);
-            await File.WriteAllTextAsync(fileName + ".json", jsonString);
+            File.WriteAllTextAsync(fileName + ".json", jsonString);
         }
     }
 }
