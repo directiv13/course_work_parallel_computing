@@ -25,11 +25,11 @@ namespace Server
         }
 
         /// <summary>
-        /// Метод для послідовнох побудови індексу
+        /// Метод для послідовної побудови індексу
         /// </summary>
         public void Build(string directory)
         {
-            string[] fileNames = Directory.GetFiles(@"datasets\acllmdb\test\neg").Where(x => int.Parse(Path.GetFileName(x).Split('_')[0]) >= StartFileIndex && int.Parse(Path.GetFileName(x).Split('_')[0]) <= EndFileIndex).ToArray();
+            string[] fileNames = Directory.GetFiles(directory).Where(x => int.Parse(Path.GetFileName(x).Split('_')[0]) >= StartFileIndex && int.Parse(Path.GetFileName(x).Split('_')[0]) <= EndFileIndex).ToArray();
 
             foreach (string fileName in fileNames)
             {
@@ -52,9 +52,9 @@ namespace Server
         /// Метод для паралельної побудови індексу
         /// </summary>
         /// <param name="threadNumb">Кількість потоків</param>
-        public void BuildParallel(int threadNumb)
+        public void BuildParallel(int threadNumb, string directory)
         {
-            string[] fileNames = Directory.GetFiles(@"datasets\acllmdb\test\neg").Where(x => int.Parse(Path.GetFileName(x).Split('_')[0]) >= StartFileIndex && int.Parse(Path.GetFileName(x).Split('_')[0]) <= EndFileIndex).ToArray();
+            string[] fileNames = Directory.GetFiles(directory).Where(x => int.Parse(Path.GetFileName(x).Split('_')[0]) >= StartFileIndex && int.Parse(Path.GetFileName(x).Split('_')[0]) <= EndFileIndex).ToArray();
 
             int filesAmount = EndFileIndex - StartFileIndex + 1;
             int fileThread = filesAmount / threadNumb;
@@ -65,7 +65,12 @@ namespace Server
                 int startFileIndex = StartFileIndex + fileThread * i;
                 int endFileIndex = EndFileIndex - (threadNumb - i - 1) * fileThread;
                 threads[i] = new Thread(new ParameterizedThreadStart(IndexBuildParallel));
-                threads[i].Start(new[] { startFileIndex, endFileIndex });
+                threads[i].Start(new IndexParameters()
+                {
+                    StartFileIndex = startFileIndex,
+                    EndFileIndex = endFileIndex,
+                    Directory = directory
+                });
             }
 
             for (int i = 0; i < threadNumb; i++)
@@ -80,9 +85,10 @@ namespace Server
         private void IndexBuildParallel(object obj)
         {
             Console.WriteLine("Index. Thread {0} started.", Thread.CurrentThread.ManagedThreadId);
-            int[] parameters = (int[])obj;
-            int startFileIndex = parameters[0];
-            int endFileIndex = parameters[1];
+            IndexParameters parameters = (IndexParameters)obj;
+            int startFileIndex = parameters.StartFileIndex;
+            int endFileIndex = parameters.EndFileIndex;
+            string directory = parameters.Directory;
 
             string[] fileNames = Directory.GetFiles(@"datasets\acllmdb\test\neg").Where(x => int.Parse(Path.GetFileName(x).Split('_')[0]) >= startFileIndex && int.Parse(Path.GetFileName(x).Split('_')[0]) <= endFileIndex).ToArray();
 
