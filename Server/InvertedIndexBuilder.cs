@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Server
@@ -19,7 +21,25 @@ namespace Server
 
         public void Build()
         {
-            throw new NotImplementedException();
+            string[] fileNames = Directory.GetFiles(@"datasets\acllmdb\test\neg").Where(x => int.Parse(Path.GetFileName(x).Split('_')[0]) >= StartFileIndex && int.Parse(Path.GetFileName(x).Split('_')[0]) <= EndFileIndex).ToArray();
+
+            foreach (string fileName in fileNames)
+            {
+                List<string> content = ReadFile(fileName).ToList();
+                foreach (var token in content)
+                {
+                    if (!InvertedIndex.ContainsKey(token))
+                    {
+                        InvertedIndex.Add(token, new HashSet<string> { Path.GetFileName(fileName) });
+                    }
+                    else
+                    {
+                        InvertedIndex[token].Add(Path.GetFileName(fileName));
+                    }
+
+                }
+            }
+            WriteToJson("InvertedIndex");
         }
         public void BuildParallel(int threadNumb)
         {
