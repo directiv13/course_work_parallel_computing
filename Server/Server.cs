@@ -21,6 +21,28 @@ namespace Server
             string jsonString = File.ReadAllText("InvertedIndex.json");
             index = JsonSerializer.Deserialize<Dictionary<string, HashSet<string>>>(jsonString);
         }
-        
+        /// <summary>
+        /// Запуск
+        /// </summary>
+        public void Run()
+        {
+            throw new NotImplementedException();
+        }
+        private void Process(object obj)
+        {
+            throw new NotImplementedException();
+        }
+        private IEnumerable<string> Search(string searchRequest)
+        {
+            throw new NotImplementedException();
+        }
+        private string ReceiveRequest(Socket handler)
+        {
+            throw new NotImplementedException();
+        }
+        private void SendResult(Socket handler, string data)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
