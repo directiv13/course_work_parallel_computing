@@ -16,5 +16,26 @@ namespace Server
             EndFileIndex = endFileIndex;
             InvertedIndex = new SortedDictionary<string, HashSet<string>>();
         }
+
+        public void Build()
+        {
+            throw new NotImplementedException();
+        }
+        public void BuildParallel(int threadNumb)
+        {
+            throw new NotImplementedException();
+        }
+        private void IndexBuildParallel(object obj)
+        {
+            throw new NotImplementedException();
+        }
+        private IEnumerable<string> ReadFile(string fileName)
+        {
+            throw new NotImplementedException();
+        }
+        private async void WriteToJson(string fileName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
