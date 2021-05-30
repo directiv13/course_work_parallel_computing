@@ -6,6 +6,7 @@ using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
 using System.Threading;
+using System.Linq;
 
 namespace Server
 {
@@ -44,9 +45,21 @@ namespace Server
                 Console.WriteLine(ex.Message);
             }
         }
+        /// <summary>
+        /// Метод для виконання у окремому потоці
+        /// </summary>
+        /// <param name="obj">Параметри методу</param>
         private void Process(object obj)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Thread ID: {0}", Thread.CurrentThread.ManagedThreadId);
+            Socket handler = (Socket)obj;
+            string searchRequest = ReceiveRequest(handler);
+            Console.WriteLine("ThreadID: {0}\nReceived request: {1}", Thread.CurrentThread.ManagedThreadId, searchRequest);
+            List<string> searchResult = Search(searchRequest).ToList();
+            StringBuilder builder = new StringBuilder();
+            builder.AppendJoin(' ', searchResult);
+
+            SendResult(handler, builder.ToString());
         }
         private IEnumerable<string> Search(string searchRequest)
         {
