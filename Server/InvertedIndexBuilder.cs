@@ -125,9 +125,14 @@ namespace Server
             result.RemoveAll(x => x == "");
             return result;
         }
+        /// <summary>
+        /// Запис у файл з розширенням .json
+        /// </summary>
+        /// <param name="fileName">Назва файлу</param>
         private async void WriteToJson(string fileName)
         {
-            throw new NotImplementedException();
+            string jsonString = JsonSerializer.Serialize<SortedDictionary<string, HashSet<string>>>(InvertedIndex);
+            await File.WriteAllTextAsync(fileName + ".json", jsonString);
         }
     }
 }
