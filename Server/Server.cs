@@ -97,9 +97,17 @@ namespace Server
             }
             return request;
         }
+        /// <summary>
+        /// Надислаємо відповідь користувачу
+        /// </summary>
+        /// <param name="handler">Сокет, що обслуговує даного користувача</param>
+        /// <param name="data">Дані, що будуть надіслані користувачу</param>
         private void SendResult(Socket handler, string data)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("ThreadID: {0}\nSearch result: {0}", Thread.CurrentThread.ManagedThreadId, data);
+            byte[] msg = Encoding.ASCII.GetBytes(data);
+
+            handler.Send(msg);
         }
     }
 }
