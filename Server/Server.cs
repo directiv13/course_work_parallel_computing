@@ -61,9 +61,20 @@ namespace Server
 
             SendResult(handler, builder.ToString());
         }
+        /// <summary>
+        /// Повертає колекцію імен документів у яких міститься запит
+        /// </summary>
+        /// <param name="searchRequest">Пошуковий запит</param>
         private IEnumerable<string> Search(string searchRequest)
         {
-            throw new NotImplementedException();
+            searchRequest = searchRequest.Replace("<EOF>", "");
+            string[] termins = searchRequest.ToLower().Split(' ');
+            HashSet<string> searchResult = index[termins[0]];
+
+            for (int i = 1; i < termins.Length; i++)
+                searchResult.IntersectWith(index[termins[i]]);
+
+            return searchResult;
         }
         private string ReceiveRequest(Socket handler)
         {
