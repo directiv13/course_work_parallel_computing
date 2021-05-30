@@ -6,7 +6,11 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            InvertedIndexBuilder index = new InvertedIndexBuilder(0, 249);
+            index.BuildParallel(5);
+
+            Server server = new Server();
+            server.Run();
         }
     }
 }
